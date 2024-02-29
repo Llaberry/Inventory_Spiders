@@ -136,7 +136,7 @@ jobs:
       - name: Download & Run 
         run: |
           # Presets
-          set -x ; set +e
+          set +x ; set +e
           #--------------#
           # Download
           curl -qfsSL "https://$INVENTORY_REPO_USER:$INVENTORY_REPO_TOKEN@raw.githubusercontent.com/Azathothas/Inventory/main/.github/scripts/crawl_servers_getjs.sh" -o "./crawl_servers_getjs.sh"
