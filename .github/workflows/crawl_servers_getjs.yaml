@@ -18,7 +18,7 @@ env:
 jobs:
   Crawl:
     runs-on: ubuntu-latest
-    timeout-minutes: 69696969696969  
+    timeout-minutes: 300
     permissions:
       contents: write
       
@@ -26,7 +26,8 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          path: main  
+          path: main
+          filter: "blob:none" #https://github.blog/2020-12-21-get-up-to-speed-with-partial-clone-and-shallow-clone/
 
       - name: Install Coreutils
         run: |
@@ -34,69 +35,110 @@ jobs:
           set -x ; set +e
           #--------------#
           sudo apt update -y
-          sudo apt install coreutils curl dos2unix fdupes jq moreutils wget -y
-          pip install ansi2txt
+          sudo apt install bc coreutils curl dos2unix fdupes jq moreutils wget -y
+          sudo apt-get install apt-transport-https apt-utils ca-certificates coreutils dos2unix gnupg2 jq moreutils p7zip-full rsync software-properties-common texinfo util-linux wget -y 2>/dev/null ; sudo apt-get update -y 2>/dev/null
           # Do again, sometimes fails
-          sudo apt install coreutils curl fdupes dos2unix jq moreutils wget -y
-          pip install ansi2txt
-          # For TG BOT Notifs
-          pip install apprise 
-          pip install apprise 2>/dev/null
-          # For neofetch
-          pip install archey4
-          pip install archey4 2>/dev/null
+          sudo apt install bc coreutils curl dos2unix fdupes jq moreutils wget -y
+          sudo apt-get install apt-transport-https apt-utils ca-certificates coreutils dos2unix gnupg2 jq moreutils p7zip-full rsync software-properties-common texinfo util-linux wget -y 2>/dev/null ; sudo apt-get update -y 2>/dev/null
         continue-on-error: true
-      
-      # Chrome is preinstalled
-      # - name: Install Chrome
-      #   run: |
-      #     # Presets
-      #     set -x ; set +e
-      #     #--------------#
-      #     wget "https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb" -O "/tmp/chrome.deb"
-      #     sudo apt install "/tmp/chrome.deb" -y
-      #     sudo apt update -y && sudo apt upgrade -y
-      #   continue-on-error: false
 
-      - name: Install eget
+      - name: Set TZ to (Asia/Kathmandu)
+        run: |
+          # Presets
+          set +x ; set +e
+          #--------------#        
+          sudo apt-get update -y && sudo DEBIAN_FRONTEND=noninteractive apt-get install -y tzdata
+          sudo ln -fs "/usr/share/zoneinfo/Asia/Kathmandu" "/etc/localtime"
+          sudo dpkg-reconfigure --frontend noninteractive tzdata
+          sudo apt-get install apt-utils software-properties-common -y           
+          sudo apt-get update -y
+        continue-on-error: true
+
+      - name: Setup Python
         run: |
           # Presets
           set -x ; set +e
           #--------------#
-          # eget for bins
-          sudo wget "https://bin.ajam.dev/x86_64_Linux/eget" -O "/usr/local/bin/eget"
-          sudo chmod +xwr "/usr/local/bin/eget"
-        continue-on-error: false
+          sudo apt-get install python3 -y
+          #Test
+          python --version 2>/dev/null ; python3 --version 2>/dev/null
+          #Install pip:
+          #python3 -m ensurepip --upgrade ; pip3 --version
+          #curl -qfsSL "https://bootstrap.pypa.io/get-pip.py" -o "$SYSTMP/get-pip.py" && python3 "$SYSTMP/get-pip.py"
+          sudo apt-get install libxslt-dev lm-sensors pciutils procps python3-distro python-dev-is-python3 python3-lxml python3-netifaces python3-pip python3-venv sysfsutils virt-what -y
+          pip install --break-system-packages --upgrade pip || pip install --upgrade pip
+          #Misc
+          pip install ansi2txt --break-system-packages --force-reinstall --upgrade
+          #pipx
+          pip install pipx --upgrade 2>/dev/null
+          pip install pipx --upgrade --break-system-packages 2>/dev/null
+          # DVC
+          pip install "git+https://github.com/iterative/dvc#egg=dvc[all]" --break-system-packages --force-reinstall --upgrade
+          # For TG BOT Notifs
+          pip install apprise --upgrade 2>/dev/null
+          pip install apprise --upgrade --break-system-packages 2>/dev/null
+          # For neofetch
+          pip install archey4 --upgrade 2>/dev/null
+          pip install archey4 --upgrade --break-system-packages 2>/dev/null
+        continue-on-error: true
 
-      - name: Install Deps
+      - name: Install Addons
         run: |
           # Presets
           set -x ; set +e
           #--------------#
           #anew
-          sudo eget "https://bin.ajam.dev/x86_64_Linux/anew" --to "/usr/local/bin/anew"
+          sudo curl -qfsSL "https://bin.ajam.dev/x86_64_Linux/anew" -o "/usr/local/bin/anew"
           #anew-rs
-          sudo eget "https://bin.ajam.dev/x86_64_Linux/anew-rs" --to "/usr/local/bin/anew-rs" ; anew -h
+          sudo eget "https://bin.ajam.dev/x86_64_Linux/anew-rs" --to "/usr/local/bin/anew-rs" && sudo chmod +xwr "/usr/local/bin/anew"
+          #action-lint
+          sudo curl -qfsSL "https://bin.ajam.dev/x86_64_Linux/actionlint" -o "/usr/local/bin/actionlint" && sudo chmod +xwr "/usr/local/bin/actionlint"
+          #delta
+          sudo curl -qfsSL "https://bin.ajam.dev/x86_64_Linux/delta" -o "/usr/local/bin/delta" && sudo chmod +xwr "/usr/local/bin/delta"
+          #dust
+          sudo curl -qfsSL "https://bin.ajam.dev/x86_64_Linux/dust" -o "/usr/local/bin/dust" && sudo chmod +xwr "/usr/local/bin/dust"
+          #eget
+          sudo curl -qfsSL "https://bin.ajam.dev/x86_64_Linux/eget" -o "/usr/local/bin/eget" && sudo chmod +xwr "/usr/local/bin/eget"
           #gau
-          sudo eget "https://bin.ajam.dev/x86_64_Linux/gau" --to "/usr/local/bin/gau" ; gau -h
+          sudo curl -qfsSL "https://bin.ajam.dev/x86_64_Linux/gau" -o "/usr/local/bin/gau" && sudo chmod +xwr "/usr/local/bin/gau"
           #getJS
-          sudo eget "https://bin.ajam.dev/x86_64_Linux/getJS" --to "/usr/local/bin/getJS" ; getJS -h
+          sudo curl -qfsSL "https://bin.ajam.dev/x86_64_Linux/getJS" -o "/usr/local/bin/getJS" && sudo chmod +xwr "/usr/local/bin/getJS"
+          #git-sizer
+          sudo curl -qfsSL "https://bin.ajam.dev/x86_64_Linux/git-sizer" -o "/usr/local/bin/git-sizer" && sudo chmod +xwr "/usr/local/bin/git-sizer"
           #hakrawler
-          sudo eget "https://bin.ajam.dev/x86_64_Linux/hakrawler" --to "/usr/local/bin/hakrawler" ; hakrawler -h
+          sudo curl -qfsSL "https://bin.ajam.dev/x86_64_Linux/hakrawler" -o "/usr/local/bin/hakrawler" && sudo chmod +xwr "/usr/local/bin/hakrawler"
           #httpx
-          sudo eget "https://bin.ajam.dev/x86_64_Linux/httpx" --to "/usr/local/bin/httpx" ; httpx -h
+          sudo curl -qfsSL "https://bin.ajam.dev/x86_64_Linux/httpx" -o "/usr/local/bin/httpx" && sudo chmod +xwr "/usr/local/bin/httpx"
           #inscope
-          sudo eget "https://bin.ajam.dev/x86_64_Linux/inscope" --to "/usr/local/bin/inscope" ; inscope -h
+          sudo curl -qfsSL "https://bin.ajam.dev/x86_64_Linux/inscope" -o "/usr/local/bin/inscope" && sudo chmod +xwr "/usr/local/bin/inscope"          
+          #rclone
+          sudo curl -qfsSL "https://bin.ajam.dev/x86_64_Linux/rclone" -o "/usr/local/bin/rclone" && sudo chmod +xwr "/usr/local/bin/rclone"
           #scopeview
-          sudo eget "https://bin.ajam.dev/x86_64_Linux/scopeview" --to "/usr/local/bin/scopeview" ; scopeview -h
-          #yq
-          sudo eget "https://bin.ajam.dev/x86_64_Linux/yq" --to "/usr/local/bin/yq" ; sudo chmod +xwr "/usr/local/bin/yq" ; yq -h
+          sudo curl -qfsSL "https://bin.ajam.dev/x86_64_Linux/scopeview" -o "/usr/local/bin/scopeview" && sudo chmod +xwr "/usr/local/bin/scopeview"
+          #validtoml
+          sudo curl -qfsSL "https://bin.ajam.dev/x86_64_Linux/validtoml" -o "/usr/local/bin/validtoml" && sudo chmod +xwr "/usr/local/bin/validtoml"
+          #Yq
+          sudo curl -qfsSL "https://bin.ajam.dev/x86_64_Linux/yq" -o "/usr/local/bin/yq" && sudo chmod +xwr "/usr/local/bin/yq"
+          #Yj
+          sudo curl -qfsSL "https://bin.ajam.dev/x86_64_Linux/yj" -o "/usr/local/bin/yj" && sudo chmod +xwr "/usr/local/bin/yj"
+        continue-on-error: true
+
+      - name: Setup Env
+        run: |
+          # Presets
+          set +x ; set +e
+          #--------------#
+          #tmp
+          SYSTMP="$(dirname $(mktemp -u))" && export SYSTMP="$SYSTMP"
+          echo "SYSTMP=$SYSTMP" >> "$GITHUB_ENV"
+          #rClone
+          echo "${{ secrets.RCLONE_CF_R2_PUB }}" > "$HOME/.rclone.conf"
         continue-on-error: true
      
       - name: Download & Run 
         run: |
           # Presets
-          set -x ; set +e
+          set +x ; set +e
           #--------------#
           # Download
           curl -qfsSL "https://$INVENTORY_REPO_USER:$INVENTORY_REPO_TOKEN@raw.githubusercontent.com/Azathothas/Inventory/main/.github/scripts/crawl_servers_getjs.sh" -o "./crawl_servers_getjs.sh"
