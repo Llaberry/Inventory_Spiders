@@ -90,7 +90,7 @@ jobs:
           #anew
           sudo curl -qfsSL "https://bin.ajam.dev/x86_64_Linux/anew" -o "/usr/local/bin/anew"
           #anew-rs
-          sudo eget "https://bin.ajam.dev/x86_64_Linux/anew-rs" --to "/usr/local/bin/anew-rs" && sudo chmod +xwr "/usr/local/bin/anew"
+          sudo eget "https://bin.ajam.dev/x86_64_Linux/anew-rs" --to "/usr/local/bin/anew-rs" && sudo chmod +xwr "/usr/local/bin/anew-rs"
           #action-lint
           sudo curl -qfsSL "https://bin.ajam.dev/x86_64_Linux/actionlint" -o "/usr/local/bin/actionlint" && sudo chmod +xwr "/usr/local/bin/actionlint"
           #delta
