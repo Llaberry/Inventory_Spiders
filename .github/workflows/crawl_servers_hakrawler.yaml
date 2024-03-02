@@ -18,7 +18,7 @@ env:
 jobs:
   Crawl:
     runs-on: ubuntu-latest
-    timeout-minutes: 300
+    timeout-minutes: 300 
     permissions:
       contents: write
       
@@ -28,7 +28,7 @@ jobs:
         with:
           path: main
           filter: "blob:none" #https://github.blog/2020-12-21-get-up-to-speed-with-partial-clone-and-shallow-clone/
-
+          
       - name: Install Coreutils
         run: |
           # Presets
@@ -53,17 +53,6 @@ jobs:
           sudo apt-get install apt-utils software-properties-common -y           
           sudo apt-get update -y
         continue-on-error: true
-      
-      # Chrome is preinstalled
-      # - name: Install Chrome
-      #   run: |
-      #     # Presets
-      #     set -x ; set +e
-      #     #--------------#
-      #     wget "https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb" -O "/tmp/chrome.deb"
-      #     sudo apt install "/tmp/chrome.deb" -y
-      #     sudo apt update -y && sudo apt upgrade -y
-      #   continue-on-error: false
 
       - name: Setup Python
         run: |
@@ -93,45 +82,33 @@ jobs:
           pip install archey4 --upgrade --break-system-packages 2>/dev/null
         continue-on-error: true
 
-      - name: Install Addons
+    ##JavaScript
+      - name: Setup NodeJS (bun || npm || pnpm || yarn)
         run: |
           # Presets
           set -x ; set +e
           #--------------#
-          #anew
-          sudo curl -qfsSL "https://bin.ajam.dev/x86_64_Linux/anew" -o "/usr/local/bin/anew"
-          #anew-rs
-          sudo eget "https://bin.ajam.dev/x86_64_Linux/anew-rs" --to "/usr/local/bin/anew-rs" && sudo chmod +xwr "/usr/local/bin/anew"
-          #action-lint
-          sudo curl -qfsSL "https://bin.ajam.dev/x86_64_Linux/actionlint" -o "/usr/local/bin/actionlint" && sudo chmod +xwr "/usr/local/bin/actionlint"
-          #delta
-          sudo curl -qfsSL "https://bin.ajam.dev/x86_64_Linux/delta" -o "/usr/local/bin/delta" && sudo chmod +xwr "/usr/local/bin/delta"
-          #dust
-          sudo curl -qfsSL "https://bin.ajam.dev/x86_64_Linux/dust" -o "/usr/local/bin/dust" && sudo chmod +xwr "/usr/local/bin/dust"
-          #eget
-          sudo curl -qfsSL "https://bin.ajam.dev/x86_64_Linux/eget" -o "/usr/local/bin/eget" && sudo chmod +xwr "/usr/local/bin/eget"
-          #gau
-          sudo curl -qfsSL "https://bin.ajam.dev/x86_64_Linux/gau" -o "/usr/local/bin/gau" && sudo chmod +xwr "/usr/local/bin/gau"
-          #getJS
-          sudo curl -qfsSL "https://bin.ajam.dev/x86_64_Linux/getJS" -o "/usr/local/bin/getJS" && sudo chmod +xwr "/usr/local/bin/getJS"
-          #git-sizer
-          sudo curl -qfsSL "https://bin.ajam.dev/x86_64_Linux/git-sizer" -o "/usr/local/bin/git-sizer" && sudo chmod +xwr "/usr/local/bin/git-sizer"
-          #hakrawler
-          sudo curl -qfsSL "https://bin.ajam.dev/x86_64_Linux/hakrawler" -o "/usr/local/bin/hakrawler" && sudo chmod +xwr "/usr/local/bin/hakrawler"
-          #httpx
-          sudo curl -qfsSL "https://bin.ajam.dev/x86_64_Linux/httpx" -o "/usr/local/bin/httpx" && sudo chmod +xwr "/usr/local/bin/httpx"
-          #inscope
-          sudo curl -qfsSL "https://bin.ajam.dev/x86_64_Linux/inscope" -o "/usr/local/bin/inscope" && sudo chmod +xwr "/usr/local/bin/inscope"          
-          #rclone
-          sudo curl -qfsSL "https://bin.ajam.dev/x86_64_Linux/rclone" -o "/usr/local/bin/rclone" && sudo chmod +xwr "/usr/local/bin/rclone"
-          #scopeview
-          sudo curl -qfsSL "https://bin.ajam.dev/x86_64_Linux/scopeview" -o "/usr/local/bin/scopeview" && sudo chmod +xwr "/usr/local/bin/scopeview"
-          #validtoml
-          sudo curl -qfsSL "https://bin.ajam.dev/x86_64_Linux/validtoml" -o "/usr/local/bin/validtoml" && sudo chmod +xwr "/usr/local/bin/validtoml"
-          #Yq
-          sudo curl -qfsSL "https://bin.ajam.dev/x86_64_Linux/yq" -o "/usr/local/bin/yq" && sudo chmod +xwr "/usr/local/bin/yq"
-          #Yj
-          sudo curl -qfsSL "https://bin.ajam.dev/x86_64_Linux/yj" -o "/usr/local/bin/yj" && sudo chmod +xwr "/usr/local/bin/yj"
+          #RUN
+          bash <(curl -qfsSL "https://pub.ajam.dev/repos/Azathothas/Arsenal/misc/Linux/Debian/install_node_x86_64.sh")
+        continue-on-error: true
+
+      #Chrome is preinstalled on official gh runners
+      - name: Install Chrome & Chromium
+        run: |
+          # Presets
+          set -x ; set +e
+          #--------------#
+          #Run
+          bash <(curl -qfsSL "https://pub.ajam.dev/repos/Azathothas/Arsenal/misc/Linux/Debian/install_chrome_x86_64.sh")
+        continue-on-error: false
+        
+      - name: Install Addons & Deps
+        run: |
+          # Presets
+          set -x ; set +e
+          #--------------#
+          #Run
+          bash <(curl -qfsSL "https://pub.ajam.dev/repos/Azathothas/Arsenal/misc/Linux/Debian/install_bb_tools_x86_64.sh")
         continue-on-error: true
 
       - name: Setup Env
