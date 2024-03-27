@@ -120,7 +120,8 @@ jobs:
           SYSTMP="$(dirname $(mktemp -u))" && export SYSTMP="$SYSTMP"
           echo "SYSTMP=$SYSTMP" >> "$GITHUB_ENV"
           #rClone
-          echo "${{ secrets.RCLONE_CF_R2_PUB }}" > "$HOME/.rclone.conf"
+          mkdir -p "$HOME/.config/rclone"
+          echo "${{ secrets.RCLONE_CF_R2_PUB }}" > "$HOME/.config/rclone/rclone.conf"
         continue-on-error: true
      
       - name: Download & Run 
